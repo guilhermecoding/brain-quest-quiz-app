@@ -11,5 +11,7 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 // Cores personalizadas
-val PurpleTheme = Color(126, 128, 216)
-val YellowTheme = Color(247, 217, 50)
+val BackgroundColorTheme = Color(0xFFFFFFFF)
+val PurpleTheme = Color(0xFF7E80D8)
+val YellowTheme = Color(0xFFF7D932)
+val GreyTheme = Color(0xFFF3F3F3)
