@@ -12,6 +12,8 @@ val Pink40 = Color(0xFF7D5260)
 
 // Cores personalizadas
 val BackgroundColorTheme = Color(0xFFFFFFFF)
+val BorderColorTheme = Color.Black
+val PrimaryTextColor = Color.Black
 val PurpleTheme = Color(0xFF7E80D8)
 val YellowTheme = Color(0xFFF7D932)
 val GreyTheme = Color(0xFFF3F3F3)
