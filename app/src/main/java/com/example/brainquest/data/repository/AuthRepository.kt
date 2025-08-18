@@ -1,6 +1,7 @@
 package com.example.brainquest.data.repository
 
 
+import com.example.brainquest.data.local.PrefsManager
 import com.example.brainquest.data.model.User
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -10,11 +11,17 @@ import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
     private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val prefsManager: PrefsManager
 ) {
     suspend fun signInWithEmailAndPassword(email: String, password: String): Result<AuthResult> {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
+            result.user?.let { firebaseUser ->
+                // 3. MANDA O PREFSMANAGER SALVAR O USUÁRIO LOCALMENTE
+                prefsManager.saveUser(firebaseUser)
+            }
+
             Result.success(result)
         } catch (e: Exception) {
             Result.failure(e)
@@ -42,5 +49,10 @@ class AuthRepository @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e) // Retorna a exceção em caso de falha
         }
+    }
+
+    fun logout() {
+        auth.signOut() // Desloga do Firebase Authentication
+        prefsManager.clearUser() // Limpa os dados do SharedPreferences
     }
 }
