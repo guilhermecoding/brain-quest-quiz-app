@@ -15,6 +15,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -30,16 +34,16 @@ import com.example.brainquest.ui.components.StyledOutlinedTextField
 import com.example.brainquest.ui.theme.BrainQuestTheme
 
 @Composable
-fun LoginContainer(
+fun SingUpContainer(
     valueEmail: String,
     onValueChangeEmail: (String) -> Unit,
     isEmailFieldError: Boolean,
     onEmailFocusChanged: (Boolean) -> Unit,
     valuePassword: String,
-    onValueChangePassword: (String) -> Unit,
-    generalErrorMessage: String?,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
+    var passwordConfirmed by remember { mutableStateOf("") }
+
     Box(
         modifier = modifier
     ) {
@@ -47,7 +51,7 @@ fun LoginContainer(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Vamos fazer login?",
+                text = "Hora de criar uma conta",
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp
@@ -56,7 +60,7 @@ fun LoginContainer(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(32.dp))
 
             StyledOutlinedTextField(
                 value = valueEmail,
@@ -67,7 +71,7 @@ fun LoginContainer(
                         onEmailFocusChanged(focusState.isFocused)
                     },
                 label = "Email",
-                placeholder = "Aqui vai o seu email",
+                placeholder = "Primeiro, coloque seu email",
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.Email,
@@ -84,12 +88,38 @@ fun LoginContainer(
 
             Spacer(Modifier.height(16.dp))
 
+            // -- SENHA --
             StyledOutlinedTextField(
                 value = valuePassword,
                 onValueChange = onValueChangePassword,
                 modifier = Modifier.fillMaxWidth(),
-                label = "Senha",
-                placeholder = "Aqui vai a sua senha",
+                label = "Criar senha",
+                placeholder = "Agora, crie uma senha forte",
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Lock,
+                        contentDescription = "Icone de cadeado"
+                    )
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done // Ação "Done" aqui, pois o botão está logo abaixo
+                ),
+                visualTransformation = PasswordVisualTransformation(),
+                // Você precisará de isPasswordFieldError para melhor controle
+                isError = generalErrorMessage != null && !isEmailFieldError && valuePassword.isNotEmpty(),
+                supportingText = null
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            // -- CONFIRMAR SENHA --
+            StyledOutlinedTextField(
+                value = passwordConfirmed,
+                onValueChange = onValueChangePassword,
+                modifier = Modifier.fillMaxWidth(),
+                label = "Confirmar senha",
+                placeholder = "Digite a mesma senha para confirmar",
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.Lock,
@@ -119,7 +149,6 @@ fun LoginContainer(
                     )
                 )
             }
-
         }
     }
 }
@@ -128,9 +157,9 @@ fun LoginContainer(
 // --- Previews Atualizadas ---
 @Preview(showBackground = true, widthDp = 360)
 @Composable
-private fun LoginContainerPreview_NoError() {
+private fun SingUpContainerPreview_NoError() {
     BrainQuestTheme {
-        LoginContainer(
+        SingUpContainer(
             valueEmail = "test@example.com",
             onValueChangeEmail = {},
             isEmailFieldError = false,
@@ -145,9 +174,9 @@ private fun LoginContainerPreview_NoError() {
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
-private fun LoginContainerPreview_EmailFormatError() {
+private fun SingUpContainerPreview_EmailFormatError() {
     BrainQuestTheme {
-        LoginContainer(
+        SingUpContainer(
             valueEmail = "test@",
             onValueChangeEmail = {},
             isEmailFieldError = true,
@@ -162,9 +191,9 @@ private fun LoginContainerPreview_EmailFormatError() {
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
-private fun LoginContainerPreview_AuthErrorAndButtonDisabled() {
+private fun SingUpContainerPreview_AuthErrorAndButtonDisabled() {
     BrainQuestTheme {
-        LoginContainer(
+        SingUpContainer(
             valueEmail = "test@example.com",
             onValueChangeEmail = {},
             isEmailFieldError = false,

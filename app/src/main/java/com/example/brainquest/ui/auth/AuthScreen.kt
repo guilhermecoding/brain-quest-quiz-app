@@ -1,10 +1,13 @@
 package com.example.brainquest.ui.auth
 
 import android.util.Patterns
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +15,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,125 +35,120 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.brainquest.ui.auth.components.LoginContainer // Verifique o caminho do import
+import com.example.brainquest.ui.auth.components.SingUpContainer
+import com.example.brainquest.ui.theme.AppDimens
 import com.example.brainquest.ui.theme.BrainQuestTheme
+import com.example.brainquest.ui.theme.PrimaryTextColor
 import com.example.brainquest.ui.theme.PurpleTheme // Certifique-se que está definido no seu tema
 import com.example.brainquest.ui.theme.YellowTheme // Certifique-se que está definido no seu tema
 
 @Composable
 fun AuthScreen() {
-    // Se AuthScreen precisar gerenciar navegação ou callbacks de nível superior,
-    // eles seriam passados para AuthScreenContent aqui.
-    // Ex: AuthScreenContent(onLoginSuccess = { /* código para navegar para home */ })
     AuthScreenContent()
 }
 
 @Composable
-fun AuthScreenContent(
-    // Ex: onLoginSuccess: (() -> Unit)? = null // Callback opcional
-) {
-    // --- Estados da UI ---
+fun AuthScreenContent() {
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
+    // Adicione estados para os campos do SignUpContainer se forem diferentes
+    // var nameValue by remember { mutableStateOf("") }
+    // var confirmPasswordValue by remember { mutableStateOf("") }
     var generalErrorMessage by remember { mutableStateOf<String?>(null) }
     var isEmailFormatError by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
+    var showLogin by remember { mutableStateOf(true) } // Estado para alternar entre Login e Cadastro
 
-    // --- Funções de Validação e Lógica ---
     val isValidEmailFormat = remember(emailValue) {
-        if (emailValue.isBlank()) true // Considera formato válido se em branco (obrigatório é checado separadamente)
+        if (emailValue.isBlank()) true
         else Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()
     }
 
     fun validateEmailField(performUpdate: Boolean = true): Boolean {
         val isBlank = emailValue.isBlank()
-        val hasFormatError = !isValidEmailFormat && !isBlank // Erro de formato só se não estiver em branco E formato inválido
+        val hasFormatError = !isValidEmailFormat && !isBlank
 
         if (performUpdate) {
-            isEmailFormatError = hasFormatError // Apenas erro de formato aqui
+            isEmailFormatError = hasFormatError
             if (hasFormatError) {
                 generalErrorMessage = "Formato de e-mail inválido."
             } else if (isBlank) {
-                // Não define generalErrorMessage para "obrigatório" aqui,
-                // isso será tratado no attemptLogin para não poluir ao sair do campo.
-                // Mas pode marcar o campo como erro se a regra for campo obrigatório sempre.
-                // isEmailFormatError = true // Descomente se campo vazio deve sempre marcar como erro visual.
                 if (generalErrorMessage == "Formato de e-mail inválido.") generalErrorMessage = null
             } else {
-                // Limpa APENAS se o erro ATUAL é de formato de email.
                 if (generalErrorMessage == "Formato de e-mail inválido.") {
                     generalErrorMessage = null
                 }
             }
         }
-        return !hasFormatError && !isBlank // Válido se não tem erro de formato E não está em branco
+        return !hasFormatError && !isBlank
     }
 
     fun validatePasswordField(performUpdate: Boolean = true): Boolean {
         val isBlank = passwordValue.isBlank()
-        // Adicione outras regras como comprimento mínimo aqui
-        // val isTooShort = passwordValue.length < 6 && !isBlank
-
         if (performUpdate) {
-            // Lógica para definir isPasswordFormatError e generalErrorMessage para senha
-            // Ex: if (isTooShort) generalErrorMessage = "Senha muito curta."
-            // Se estiver em branco e houver um erro de email, não sobrescreva a mensagem.
             if (isBlank && (generalErrorMessage == null || isEmailFormatError)) {
-                // Não define generalErrorMessage para "obrigatório" aqui,
-                // isso será tratado no attemptLogin
+                // Não define generalErrorMessage para "obrigatório" aqui
             } else if (!isBlank && generalErrorMessage == "A senha é obrigatória.") {
-                generalErrorMessage = null // Limpa erro de "senha obrigatória" se algo for digitado
+                generalErrorMessage = null
             }
         }
-        return !isBlank // && !isTooShort
+        return !isBlank
     }
+    
+    // Você precisará de uma função attemptSignUp similar a attemptLogin
+    fun attemptSignUp() {
+        isLoading = true
+        generalErrorMessage = null
+        isEmailFormatError = false
+        // Validações para campos de cadastro (nome, email, senha, confirmar senha)
+        // ...
+        // Lógica de cadastro
+        println("AUTH_SCREEN_CONTENT: Tentando cadastro com E-mail: ${emailValue}, Senha: [PROTEGIDO]")
+        // Simulação
+        isLoading = false
+        generalErrorMessage = "Funcionalidade de cadastro ainda não implementada."
+        // Ou, se sucesso:
+        // showLogin = true // Volta para login após cadastro bem-sucedido, por exemplo
+    }
+
 
     fun attemptLogin() {
         isLoading = true
-        generalErrorMessage = null // Limpa mensagens de erro anteriores antes de validar
-        isEmailFormatError = false // Reseta erro de formato de email
+        generalErrorMessage = null 
+        isEmailFormatError = false 
 
-        val isEmailFieldValid = validateEmailField(performUpdate = true) // Valida e atualiza UI
-        val isPasswordFieldValid = validatePasswordField(performUpdate = true) // Valida e atualiza UI
+        val isEmailFieldValid = validateEmailField(performUpdate = true) 
+        val isPasswordFieldValid = validatePasswordField(performUpdate = true)
 
-        // Checagens de campos obrigatórios prioritárias após as de formato
         if (emailValue.isBlank()) {
             generalErrorMessage = "O e-mail é obrigatório."
-            isEmailFormatError = true // Marcar o campo de email como erro se estiver vazio
-        } else if (!isEmailFieldValid) { // Se não estiver em branco mas formato inválido
-            generalErrorMessage = "Formato de e-mail inválido." // Garante que a mensagem de formato apareça
+            isEmailFormatError = true 
+        } else if (!isEmailFieldValid) { 
+            generalErrorMessage = "Formato de e-mail inválido."
             isEmailFormatError = true
         }
 
-
         if (passwordValue.isBlank()) {
-            // Define mensagem de senha obrigatória apenas se não houver erro de email mais prioritário
             if (generalErrorMessage == null) {
                 generalErrorMessage = "A senha é obrigatória."
             }
-            // Aqui você precisaria de um 'isPasswordFieldError = true' para o campo de senha
         }
 
         if (generalErrorMessage == null && isEmailFieldValid && isPasswordFieldValid) {
-            // LÓGICA DE LOGIN REAL AQUI (ex: chamada a ViewModel)
             println("AUTH_SCREEN_CONTENT: Tentando login com E-mail: ${emailValue}, Senha: [PROTEGIDO]")
-            // Simulando chamada de API
-            // viewModelScope.launch {
-            //    delay(1500) // Simular atraso da rede
             if (emailValue == "test@example.com" && passwordValue == "password123") {
                 generalErrorMessage = null
                 isEmailFormatError = false
                 isLoading = false
                 println("AUTH_SCREEN_CONTENT: Login BEM-SUCEDIDO!")
-                // onLoginSuccess?.invoke() // Chamar se passado como parâmetro
             } else {
                 generalErrorMessage = "Usuário ou senha inválidos."
-                isEmailFormatError = false // O formato do email pode estar correto, mas as credenciais não
+                isEmailFormatError = false 
                 isLoading = false
                 println("AUTH_SCREEN_CONTENT: Login FALHOU.")
             }
-            // }
         } else {
-            isLoading = false // Se a validação dos campos falhou ou já mostrou erro
+            isLoading = false 
         }
     }
 
@@ -202,39 +203,106 @@ fun AuthScreenContent(
                             .padding(vertical = 32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        LoginContainer(
-                            valueEmail = emailValue,
-                            onValueChangeEmail = { newValue ->
-                                emailValue = newValue
-                                if (isEmailFormatError && generalErrorMessage == "Formato de e-mail inválido.") {
-                                    // Revalida para tentar limpar o erro de formato enquanto digita
-                                    validateEmailField()
-                                } else if (generalErrorMessage != null && generalErrorMessage != "O e-mail é obrigatório.") {
-                                    // Limpa outros erros (como de login) se não for erro de campo obrigatório
-                                    generalErrorMessage = null
-                                }
+                        if (showLogin) {
+                            LoginContainer(
+                                valueEmail = emailValue,
+                                onValueChangeEmail = { newValue ->
+                                    emailValue = newValue
+                                    if (isEmailFormatError && generalErrorMessage == "Formato de e-mail inválido.") {
+                                        validateEmailField()
+                                    } else if (generalErrorMessage != null && generalErrorMessage != "O e-mail é obrigatório.") {
+                                        generalErrorMessage = null
+                                    }
+                                },
+                                isEmailFieldError = isEmailFormatError,
+                                onEmailFocusChanged = { isFocused ->
+                                    if (!isFocused && emailValue.isNotBlank()) {
+                                        validateEmailField()
+                                    }
+                                },
+                                valuePassword = passwordValue,
+                                onValueChangePassword = { newValue ->
+                                    passwordValue = newValue
+                                    if (generalErrorMessage != null && generalErrorMessage != "A senha é obrigatória."){
+                                        generalErrorMessage = null
+                                    }
+                                },
+                                generalErrorMessage = generalErrorMessage,
+                                modifier = Modifier.fillMaxWidth(0.8f)
+                            )
+                        } else {
+                            SingUpContainer(
+                                valueEmail = emailValue,
+                                onValueChangeEmail = { newValue ->
+                                    emailValue = newValue
+                                    if (isEmailFormatError && generalErrorMessage == "Formato de e-mail inválido.") {
+                                        validateEmailField()
+                                    } else if (generalErrorMessage != null && generalErrorMessage != "O e-mail é obrigatório.") {
+                                        generalErrorMessage = null
+                                    }
+                                },
+                                isEmailFieldError = isEmailFormatError,
+                                onEmailFocusChanged = { isFocused ->
+                                    if (!isFocused && emailValue.isNotBlank()) {
+                                        validateEmailField()
+                                    }
+                                },
+                                valuePassword = passwordValue,
+                                onValueChangePassword = { newValue ->
+                                    passwordValue = newValue
+                                    if (generalErrorMessage != null && generalErrorMessage != "A senha é obrigatória."){
+                                        generalErrorMessage = null
+                                    }
+                                },
+                                generalErrorMessage = generalErrorMessage,
+                                modifier = Modifier.fillMaxWidth(0.8f)
+                            )
+                        }
+
+                        Spacer(Modifier.height(42.dp))
+
+                        OutlinedButton(
+                            onClick = { if (showLogin) attemptLogin() else attemptSignUp() }, // Ação do botão muda
+                            enabled = !isLoading,
+                            modifier = Modifier.fillMaxWidth(0.8f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = YellowTheme,
+                                contentColor = PrimaryTextColor
+                            ),
+                            border = BorderStroke(AppDimens.DefaultBorderWidth.width, AppDimens.DefaultBorderWidth.color),
+                            contentPadding = PaddingValues(horizontal = 40.dp, vertical = 16.dp)
+                        ) {
+                            Text(
+                                text = if (showLogin) "ENTRAR" else "CADASTRAR", // Texto do botão muda
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp
+                                )
+                            )
+                        }
+
+                        Spacer(Modifier.height(16.dp)) // Espaço antes do TextButton
+
+                        TextButton(
+                            onClick = {
+                                showLogin = !showLogin
+                                generalErrorMessage = null // Limpa erros ao alternar
+                                isEmailFormatError = false // Limpa erro de email ao alternar
+                                // Resete os valores dos campos ao alternar para não manter dados entre formulários
+                                emailValue = ""
+                                passwordValue = ""
+                                // nameValue = ""
+                                // confirmPasswordValue = ""
+
                             },
-                            isEmailFieldError = isEmailFormatError,
-                            onEmailFocusChanged = { isFocused ->
-                                if (!isFocused && emailValue.isNotBlank()) {
-                                    validateEmailField() // Valida formato ao perder foco se não estiver em branco
-                                }
-                            },
-                            valuePassword = passwordValue,
-                            onValueChangePassword = { newValue ->
-                                passwordValue = newValue
-                                if (generalErrorMessage != null && generalErrorMessage != "A senha é obrigatória."){
-                                    generalErrorMessage = null // Limpa erros (como de login)
-                                }
-                                // Aqui você também pode adicionar lógica para limpar o 'isPasswordFormatError'
-                            },
-                            generalErrorMessage = generalErrorMessage,
-                            onLoginClick = {
-                                attemptLogin()
-                            },
-                            isLoginButtonEnabled = !isLoading,
                             modifier = Modifier.fillMaxWidth(0.8f)
-                        )
+                        ) {
+                            Text(
+                                text = if (showLogin) "Não tem uma conta? Cadastre-se" else "Já tem uma conta? Faça login",
+                                color = PrimaryTextColor,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                        }
                     }
                 }
             }
