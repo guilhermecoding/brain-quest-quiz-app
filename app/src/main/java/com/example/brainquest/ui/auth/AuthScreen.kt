@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -54,12 +55,15 @@ import com.example.brainquest.ui.theme.YellowTheme
 @Composable
 fun AuthScreen(
     viewModel: AuthViewModel = hiltViewModel(),
-    // onLoginSuccess: () -> Unit // Callback para navegar para a próxima tela
+    onLoginSuccess: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    if (state.loginSuccess) {
-        // onLoginSuccess()
+    LaunchedEffect(key1 = state.loginSuccess) {
+        if (state.loginSuccess) {
+            onLoginSuccess() // Chama a função de navegação
+            viewModel.onNavigationHandled() // Avisa o ViewModel que a navegação foi tratada
+        }
     }
 
     AuthScreenContent(

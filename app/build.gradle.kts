@@ -67,6 +67,9 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines.play.services)
 
+    // Navigation Compose
+    implementation(libs.androidx.navigation.compose)
+
     // Dependências de Teste
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -66,6 +66,10 @@ class AuthViewModel @Inject constructor(
         _uiState.value = AuthState(isLoginScreen = !_uiState.value.isLoginScreen)
     }
 
+    fun onNavigationHandled() {
+        _uiState.update { it.copy(loginSuccess = false) }
+    }
+
     private fun validateEmailField(performUpdate: Boolean = true): Boolean {
         val currentState = _uiState.value
         val isBlank = currentState.emailValue.isBlank()
