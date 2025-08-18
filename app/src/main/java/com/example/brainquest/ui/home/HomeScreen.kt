@@ -30,7 +30,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     modifier: Modifier = Modifier,
-    onLogoutClicked: () -> Unit
+    onLogoutClicked: () -> Unit = {}
 ) {
     Scaffold { innerPadding ->
         Column(
@@ -40,12 +40,7 @@ fun HomeScreenContent(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Bem-vindo ao BrainQuest!")
-            // Aqui você adicionaria a lista de quizzes, o botão de ranking, etc.
 
-            Button(onClick = onLogoutClicked) {
-                Text("Sair")
-            }
         }
     }
 }
