@@ -157,7 +157,7 @@ fun AuthScreenContent(
 
                         OutlinedButton(
                             onClick = { if (state.isLoginScreen) onLoginClick() else onSignUpClick() },
-                            enabled = !state.isLoading,
+                            enabled = !state.isLoading && state.passwordValue.length >= 6 && state.emailValue.length >= 6,
                             modifier = Modifier.fillMaxWidth(0.8f),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = YellowTheme,

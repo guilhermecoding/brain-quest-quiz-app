@@ -1,8 +1,12 @@
 package com.example.brainquest.ui.auth
 
+import android.health.connect.datatypes.units.Length
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.brainquest.data.repository.AuthRepository
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +29,7 @@ data class AuthState(
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    // private val repository: AuthRepository // Você injetará seu repositório real aqui
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     // 2. StateFlow: A fonte da verdade para a UI.
@@ -97,16 +101,30 @@ class AuthViewModel @Inject constructor(
                 return@launch
             }
 
-            // Simulação de chamada de rede
-            println("AUTH_VIEW_MODEL: Tentando login com E-mail: ${currentState.emailValue}, Senha: [PROTEGIDO]")
-            delay(1500)
+            val result = authRepository.signInWithEmailAndPassword(
+                email = currentState.emailValue,
+                password = currentState.passwordValue
+            )
 
-            if (currentState.emailValue == "test@example.com" && currentState.passwordValue == "password123") {
-                _uiState.update { it.copy(isLoading = false, loginSuccess = true) }
+
+            result.onSuccess {
+                // O Firebase confirmou o login!
                 println("AUTH_VIEW_MODEL: Login BEM-SUCEDIDO!")
-            } else {
-                _uiState.update { it.copy(isLoading = false, generalErrorMessage = "Usuário ou senha inválidos.") }
-                println("AUTH_VIEW_MODEL: Login FALHOU.")
+                _uiState.update { it.copy(isLoading = false, loginSuccess = true) }
+            }
+
+            // 5. Tratando o resultado de falha com mensagens específicas
+            result.onFailure { exception ->
+                println("AUTH_VIEW_MODEL: Login FALHOU. Erro: ${exception.message}")
+                val errorMessage = when (exception) {
+                    is FirebaseAuthInvalidUserException, is FirebaseAuthInvalidCredentialsException -> {
+                        "Usuário ou senha inválidos."
+                    }
+                    else -> {
+                        "Ocorreu um erro inesperado. Tente novamente."
+                    }
+                }
+                _uiState.update { it.copy(isLoading = false, generalErrorMessage = errorMessage) }
             }
         }
     }
