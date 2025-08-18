@@ -16,4 +16,5 @@ val BorderColorTheme = Color.Black
 val PrimaryTextColor = Color.Black
 val PurpleTheme = Color(0xFF7E80D8)
 val YellowTheme = Color(0xFFF7D932)
+val YellowThemeSecondary = Color(0xFFF57C00)
 val GreyTheme = Color(0xFFF3F3F3)
