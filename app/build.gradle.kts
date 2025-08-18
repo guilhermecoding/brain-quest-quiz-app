@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt") // Adicione esta linha
+    id("com.google.dagger.hilt.android") // Adicione esta linha
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -40,7 +43,7 @@ android {
 }
 
 dependencies {
-
+    // Padrão do Android e Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -49,6 +52,25 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Ele gerencia todas as versões das bibliotecas do Firebase abaixo
+    implementation(platform(libs.firebase.bom.v3410))
+
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    // Navigation Compose
+    implementation(libs.androidx.navigation.compose)
+
+    // Dependências de Teste
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

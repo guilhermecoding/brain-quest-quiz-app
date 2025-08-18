@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "173227064383",
+    "project_id": "brain-quest-449cb",
+    "storage_bucket": "brain-quest-449cb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173227064383:android:7dac53a5c88df5244bcc8a",
+        "android_client_info": {
+          "package_name": "com.example.brainquest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0SCYTZDcd6DnkKAQl9B46EQA-pnX_es8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
