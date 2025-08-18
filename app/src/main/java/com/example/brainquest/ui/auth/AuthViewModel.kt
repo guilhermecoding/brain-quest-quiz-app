@@ -158,7 +158,7 @@ class AuthViewModel @Inject constructor(
 
             // Chama a função do repositório com os dados da UI
             val result = authRepository.createUser(
-                name = "Nome do Usuário", // Substitua pelo valor do campo de nome: currentState.nameValue
+                name = currentState.nameUser, // Substitua pelo valor do campo de nome: currentState.nameValue
                 email = currentState.emailValue,
                 password = currentState.passwordValue
             )
