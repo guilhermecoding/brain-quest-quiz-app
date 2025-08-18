@@ -16,7 +16,8 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 uiTextGoogleFonts = "1.9.0"
 uiTextGoogleFontsVersion = "1.8.1"
-firebaseAuthKtx = "24.0.1"
+firebaseAuthKtx = "23.2.0"
+firebaseFirestoreKtx = "25.1.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -27,6 +28,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-bom-v3281 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 firebase-bom-v3410 = { module = "com.google.firebase:firebase-bom", version.ref = "googleFirebaseBom" }
 google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
+google-firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltCompiler" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -44,6 +46,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version = "23.2.0" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

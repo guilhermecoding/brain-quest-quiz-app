@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -66,6 +67,7 @@ fun AuthScreen(
         onEmailChange = viewModel::onEmailChange,
         onPasswordChange = viewModel::onPasswordChange,
         onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
+        onNameChange = viewModel::onNameChange,
         onEmailFocusChanged = viewModel::onEmailFocusChanged,
         onLoginClick = viewModel::attemptLogin,
         onSignUpClick = viewModel::attemptSignUp,
@@ -80,6 +82,7 @@ fun AuthScreenContent(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
+    onNameChange: (String) -> Unit,
     onEmailFocusChanged: () -> Unit,
     onLoginClick: () -> Unit,
     onSignUpClick: () -> Unit,
@@ -149,7 +152,8 @@ fun AuthScreenContent(
                                 onEmailChange = onEmailChange,
                                 onPasswordChange = onPasswordChange,
                                 onConfirmPasswordChange = onConfirmPasswordChange,
-                                onEmailFocusChanged = onEmailFocusChanged
+                                onEmailFocusChanged = onEmailFocusChanged,
+                                onNameChange = onNameChange
                             )
                         }
 
@@ -275,6 +279,7 @@ fun SignUpContainer(
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
     onEmailFocusChanged: () -> Unit,
+    onNameChange: (String) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -290,13 +295,26 @@ fun SignUpContainer(
         Spacer(Modifier.height(32.dp))
 
         StyledOutlinedTextField(
+            value = state.nameUser,
+            onValueChange = onNameChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = "Nome",
+            placeholder = "Primeiro, digite seu nome",
+            leadingIcon = { Icon(imageVector = Icons.Rounded.Person, contentDescription = "Icone de pessoa") },
+            isError = state.isEmailFormatError,
+            supportingText = null
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        StyledOutlinedTextField(
             value = state.emailValue,
             onValueChange = onEmailChange,
             modifier = Modifier.fillMaxWidth().onFocusChanged { focusState ->
                 if (!focusState.isFocused && state.emailValue.isNotBlank()) { onEmailFocusChanged() }
             },
             label = "Email",
-            placeholder = "Primeiro, coloque seu email",
+            placeholder = "Agora, coloque seu email",
             leadingIcon = { Icon(imageVector = Icons.Rounded.Email, contentDescription = "Icone de email") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
@@ -313,7 +331,7 @@ fun SignUpContainer(
             onValueChange = onPasswordChange,
             modifier = Modifier.fillMaxWidth(),
             label = "Criar senha",
-            placeholder = "Agora, crie uma senha forte",
+            placeholder = "Por fim, crie uma senha forte",
             leadingIcon = { Icon(imageVector = Icons.Rounded.Lock, contentDescription = "Icone de cadeado") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
             visualTransformation = PasswordVisualTransformation(),

@@ -1,12 +1,14 @@
 package com.example.brainquest.ui.auth
 
 import android.health.connect.datatypes.units.Length
+import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.brainquest.data.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +22,7 @@ data class AuthState(
     val emailValue: String = "",
     val passwordValue: String = "",
     val confirmPasswordValue: String = "",
+    val nameUser: String = "",
     val isLoading: Boolean = false,
     val generalErrorMessage: String? = null,
     val isEmailFormatError: Boolean = false,
@@ -48,6 +51,10 @@ class AuthViewModel @Inject constructor(
 
     fun onConfirmPasswordChange(newValue: String) {
         _uiState.update { it.copy(confirmPasswordValue = newValue) }
+    }
+
+    fun onNameChange(newValue: String) {
+        _uiState.update { it.copy(nameUser = newValue) }
     }
 
     fun onEmailFocusChanged() {
@@ -130,12 +137,49 @@ class AuthViewModel @Inject constructor(
     }
 
     fun attemptSignUp() {
+        val currentState = _uiState.value
+
+        // --- Validações ---
+        // Adicione um campo para nome no seu AuthState e na sua UI (SignUpContainer)
+        // val name = currentState.nameValue
+        // if (name.isBlank()) { /* erro */ }
+
+        if (currentState.emailValue.isBlank() || currentState.passwordValue.isBlank()) {
+            _uiState.update { it.copy(generalErrorMessage = "E-mail e senha são obrigatórios.") }
+            return
+        }
+        if (currentState.passwordValue != currentState.confirmPasswordValue) {
+            _uiState.update { it.copy(generalErrorMessage = "As senhas não conferem.") }
+            return
+        }
+
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, generalErrorMessage = null, isEmailFormatError = false) }
-            // Adicionar validações completas de cadastro aqui (campos em branco, senhas não conferem, etc.)
-            println("AUTH_VIEW_MODEL: Tentando cadastro com E-mail: ${_uiState.value.emailValue}, Senha: [PROTEGIDO]")
-            delay(1500)
-            _uiState.update { it.copy(isLoading = false, generalErrorMessage = "Funcionalidade de cadastro ainda não implementada.") }
+            _uiState.update { it.copy(isLoading = true, generalErrorMessage = null) }
+
+            // Chama a função do repositório com os dados da UI
+            val result = authRepository.createUser(
+                name = "Nome do Usuário", // Substitua pelo valor do campo de nome: currentState.nameValue
+                email = currentState.emailValue,
+                password = currentState.passwordValue
+            )
+
+            result.onSuccess {
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    // Mensagem de sucesso e muda para a tela de login
+                    generalErrorMessage = "Cadastro realizado com sucesso! Por favor, faça o login.",
+                    isLoginScreen = true
+                )}
+            }
+
+            result.onFailure { exception ->
+                val errorMessage = when (exception) {
+                    // Erro específico para quando o e-mail já existe
+                    is FirebaseAuthUserCollisionException -> "Este e-mail já está em uso por outra conta."
+                    else -> "Ocorreu um erro no cadastro. Tente novamente."
+                }
+                _uiState.update { it.copy(isLoading = false, generalErrorMessage = errorMessage) }
+            }
         }
     }
 }

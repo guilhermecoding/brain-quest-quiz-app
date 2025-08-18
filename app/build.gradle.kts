@@ -43,7 +43,7 @@ android {
 }
 
 dependencies {
-
+    // Padrão do Android e Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -53,15 +53,22 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    // Hilt
     implementation(libs.hilt.android)
-    implementation(libs.firebase.auth.ktx)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.kotlinx.coroutines.play.services)
+
+    // Ele gerencia todas as versões das bibliotecas do Firebase abaixo
     implementation(platform(libs.firebase.bom.v3410))
 
-    testImplementation(libs.junit)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
 
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    // Dependências de Teste
+    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
