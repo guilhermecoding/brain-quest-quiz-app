@@ -1,9 +1,8 @@
 package com.example.brainquest.ui.auth
 
-import android.util.Patterns
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,144 +13,78 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.brainquest.ui.auth.components.LoginContainer // Verifique o caminho do import
-import com.example.brainquest.ui.auth.components.SingUpContainer
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.brainquest.ui.components.StyledOutlinedTextField
 import com.example.brainquest.ui.theme.AppDimens
-import com.example.brainquest.ui.theme.BrainQuestTheme
 import com.example.brainquest.ui.theme.PrimaryTextColor
-import com.example.brainquest.ui.theme.PurpleTheme // Certifique-se que está definido no seu tema
-import com.example.brainquest.ui.theme.YellowTheme // Certifique-se que está definido no seu tema
+import com.example.brainquest.ui.theme.PurpleTheme
+import com.example.brainquest.ui.theme.YellowTheme
 
+// "Container Inteligente": obtém o ViewModel e o estado.
 @Composable
-fun AuthScreen() {
-    AuthScreenContent()
+fun AuthScreen(
+    viewModel: AuthViewModel = hiltViewModel(),
+    // onLoginSuccess: () -> Unit // Callback para navegar para a próxima tela
+) {
+    val state by viewModel.uiState.collectAsState()
+
+    if (state.loginSuccess) {
+        // onLoginSuccess()
+    }
+
+    AuthScreenContent(
+        state = state,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
+        onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
+        onEmailFocusChanged = viewModel::onEmailFocusChanged,
+        onLoginClick = viewModel::attemptLogin,
+        onSignUpClick = viewModel::attemptSignUp,
+        onToggleScreen = viewModel::toggleScreen
+    )
 }
 
+// "Composable Burro": Apenas exibe o que recebe. Não tem lógica própria.
 @Composable
-fun AuthScreenContent() {
-    var emailValue by remember { mutableStateOf("") }
-    var passwordValue by remember { mutableStateOf("") }
-    // Adicione estados para os campos do SignUpContainer se forem diferentes
-    // var nameValue by remember { mutableStateOf("") }
-    // var confirmPasswordValue by remember { mutableStateOf("") }
-    var generalErrorMessage by remember { mutableStateOf<String?>(null) }
-    var isEmailFormatError by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-    var showLogin by remember { mutableStateOf(true) } // Estado para alternar entre Login e Cadastro
-
-    val isValidEmailFormat = remember(emailValue) {
-        if (emailValue.isBlank()) true
-        else Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()
-    }
-
-    fun validateEmailField(performUpdate: Boolean = true): Boolean {
-        val isBlank = emailValue.isBlank()
-        val hasFormatError = !isValidEmailFormat && !isBlank
-
-        if (performUpdate) {
-            isEmailFormatError = hasFormatError
-            if (hasFormatError) {
-                generalErrorMessage = "Formato de e-mail inválido."
-            } else if (isBlank) {
-                if (generalErrorMessage == "Formato de e-mail inválido.") generalErrorMessage = null
-            } else {
-                if (generalErrorMessage == "Formato de e-mail inválido.") {
-                    generalErrorMessage = null
-                }
-            }
-        }
-        return !hasFormatError && !isBlank
-    }
-
-    fun validatePasswordField(performUpdate: Boolean = true): Boolean {
-        val isBlank = passwordValue.isBlank()
-        if (performUpdate) {
-            if (isBlank && (generalErrorMessage == null || isEmailFormatError)) {
-                // Não define generalErrorMessage para "obrigatório" aqui
-            } else if (!isBlank && generalErrorMessage == "A senha é obrigatória.") {
-                generalErrorMessage = null
-            }
-        }
-        return !isBlank
-    }
-    
-    // Você precisará de uma função attemptSignUp similar a attemptLogin
-    fun attemptSignUp() {
-        isLoading = true
-        generalErrorMessage = null
-        isEmailFormatError = false
-        // Validações para campos de cadastro (nome, email, senha, confirmar senha)
-        // ...
-        // Lógica de cadastro
-        println("AUTH_SCREEN_CONTENT: Tentando cadastro com E-mail: ${emailValue}, Senha: [PROTEGIDO]")
-        // Simulação
-        isLoading = false
-        generalErrorMessage = "Funcionalidade de cadastro ainda não implementada."
-        // Ou, se sucesso:
-        // showLogin = true // Volta para login após cadastro bem-sucedido, por exemplo
-    }
-
-
-    fun attemptLogin() {
-        isLoading = true
-        generalErrorMessage = null 
-        isEmailFormatError = false 
-
-        val isEmailFieldValid = validateEmailField(performUpdate = true) 
-        val isPasswordFieldValid = validatePasswordField(performUpdate = true)
-
-        if (emailValue.isBlank()) {
-            generalErrorMessage = "O e-mail é obrigatório."
-            isEmailFormatError = true 
-        } else if (!isEmailFieldValid) { 
-            generalErrorMessage = "Formato de e-mail inválido."
-            isEmailFormatError = true
-        }
-
-        if (passwordValue.isBlank()) {
-            if (generalErrorMessage == null) {
-                generalErrorMessage = "A senha é obrigatória."
-            }
-        }
-
-        if (generalErrorMessage == null && isEmailFieldValid && isPasswordFieldValid) {
-            println("AUTH_SCREEN_CONTENT: Tentando login com E-mail: ${emailValue}, Senha: [PROTEGIDO]")
-            if (emailValue == "test@example.com" && passwordValue == "password123") {
-                generalErrorMessage = null
-                isEmailFormatError = false
-                isLoading = false
-                println("AUTH_SCREEN_CONTENT: Login BEM-SUCEDIDO!")
-            } else {
-                generalErrorMessage = "Usuário ou senha inválidos."
-                isEmailFormatError = false 
-                isLoading = false
-                println("AUTH_SCREEN_CONTENT: Login FALHOU.")
-            }
-        } else {
-            isLoading = false 
-        }
-    }
-
+fun AuthScreenContent(
+    state: AuthState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onConfirmPasswordChange: (String) -> Unit,
+    onEmailFocusChanged: () -> Unit,
+    onLoginClick: () -> Unit,
+    onSignUpClick: () -> Unit,
+    onToggleScreen: () -> Unit
+) {
     Scaffold(
         containerColor = PurpleTheme
     ) { innerPadding ->
@@ -203,67 +136,28 @@ fun AuthScreenContent() {
                             .padding(vertical = 32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        if (showLogin) {
+                        if (state.isLoginScreen) {
                             LoginContainer(
-                                valueEmail = emailValue,
-                                onValueChangeEmail = { newValue ->
-                                    emailValue = newValue
-                                    if (isEmailFormatError && generalErrorMessage == "Formato de e-mail inválido.") {
-                                        validateEmailField()
-                                    } else if (generalErrorMessage != null && generalErrorMessage != "O e-mail é obrigatório.") {
-                                        generalErrorMessage = null
-                                    }
-                                },
-                                isEmailFieldError = isEmailFormatError,
-                                onEmailFocusChanged = { isFocused ->
-                                    if (!isFocused && emailValue.isNotBlank()) {
-                                        validateEmailField()
-                                    }
-                                },
-                                valuePassword = passwordValue,
-                                onValueChangePassword = { newValue ->
-                                    passwordValue = newValue
-                                    if (generalErrorMessage != null && generalErrorMessage != "A senha é obrigatória."){
-                                        generalErrorMessage = null
-                                    }
-                                },
-                                generalErrorMessage = generalErrorMessage,
-                                modifier = Modifier.fillMaxWidth(0.8f)
+                                state = state,
+                                onEmailChange = onEmailChange,
+                                onPasswordChange = onPasswordChange,
+                                onEmailFocusChanged = onEmailFocusChanged
                             )
                         } else {
-                            SingUpContainer(
-                                valueEmail = emailValue,
-                                onValueChangeEmail = { newValue ->
-                                    emailValue = newValue
-                                    if (isEmailFormatError && generalErrorMessage == "Formato de e-mail inválido.") {
-                                        validateEmailField()
-                                    } else if (generalErrorMessage != null && generalErrorMessage != "O e-mail é obrigatório.") {
-                                        generalErrorMessage = null
-                                    }
-                                },
-                                isEmailFieldError = isEmailFormatError,
-                                onEmailFocusChanged = { isFocused ->
-                                    if (!isFocused && emailValue.isNotBlank()) {
-                                        validateEmailField()
-                                    }
-                                },
-                                valuePassword = passwordValue,
-                                onValueChangePassword = { newValue ->
-                                    passwordValue = newValue
-                                    if (generalErrorMessage != null && generalErrorMessage != "A senha é obrigatória."){
-                                        generalErrorMessage = null
-                                    }
-                                },
-                                generalErrorMessage = generalErrorMessage,
-                                modifier = Modifier.fillMaxWidth(0.8f)
+                            SignUpContainer(
+                                state = state,
+                                onEmailChange = onEmailChange,
+                                onPasswordChange = onPasswordChange,
+                                onConfirmPasswordChange = onConfirmPasswordChange,
+                                onEmailFocusChanged = onEmailFocusChanged
                             )
                         }
 
                         Spacer(Modifier.height(42.dp))
 
                         OutlinedButton(
-                            onClick = { if (showLogin) attemptLogin() else attemptSignUp() }, // Ação do botão muda
-                            enabled = !isLoading,
+                            onClick = { if (state.isLoginScreen) onLoginClick() else onSignUpClick() },
+                            enabled = !state.isLoading,
                             modifier = Modifier.fillMaxWidth(0.8f),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = YellowTheme,
@@ -272,33 +166,27 @@ fun AuthScreenContent() {
                             border = BorderStroke(AppDimens.DefaultBorderWidth.width, AppDimens.DefaultBorderWidth.color),
                             contentPadding = PaddingValues(horizontal = 40.dp, vertical = 16.dp)
                         ) {
-                            Text(
-                                text = if (showLogin) "ENTRAR" else "CADASTRAR", // Texto do botão muda
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
+                            if (state.isLoading) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = PrimaryTextColor, strokeWidth = 2.dp)
+                            } else {
+                                Text(
+                                    text = if (state.isLoginScreen) "ENTRAR" else "CADASTRAR",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp
+                                    )
                                 )
-                            )
+                            }
                         }
 
-                        Spacer(Modifier.height(16.dp)) // Espaço antes do TextButton
+                        Spacer(Modifier.height(16.dp))
 
                         TextButton(
-                            onClick = {
-                                showLogin = !showLogin
-                                generalErrorMessage = null // Limpa erros ao alternar
-                                isEmailFormatError = false // Limpa erro de email ao alternar
-                                // Resete os valores dos campos ao alternar para não manter dados entre formulários
-                                emailValue = ""
-                                passwordValue = ""
-                                // nameValue = ""
-                                // confirmPasswordValue = ""
-
-                            },
+                            onClick = onToggleScreen,
                             modifier = Modifier.fillMaxWidth(0.8f)
                         ) {
                             Text(
-                                text = if (showLogin) "Não tem uma conta? Cadastre-se" else "Já tem uma conta? Faça login",
+                                text = if (state.isLoginScreen) "Não tem uma conta? Cadastre-se" else "Já tem uma conta? Faça login",
                                 color = PrimaryTextColor,
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
                             )
@@ -310,10 +198,153 @@ fun AuthScreenContent() {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun AuthScreenContentPreview() {
-    BrainQuestTheme {
-        AuthScreenContent()
+fun LoginContainer(
+    state: AuthState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onEmailFocusChanged: () -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth(0.8f)
+    ) {
+        Text(
+            text = "Vamos fazer login?",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 28.sp
+            ),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(48.dp))
+
+        StyledOutlinedTextField(
+            value = state.emailValue,
+            onValueChange = onEmailChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (!focusState.isFocused && state.emailValue.isNotBlank()) {
+                        onEmailFocusChanged()
+                    }
+                },
+            label = "Email",
+            placeholder = "Aqui vai o seu email",
+            leadingIcon = { Icon(imageVector = Icons.Rounded.Email, contentDescription = "Icone de email") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+            isError = state.isEmailFormatError,
+            supportingText = null
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        StyledOutlinedTextField(
+            value = state.passwordValue,
+            onValueChange = onPasswordChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = "Senha",
+            placeholder = "Aqui vai a sua senha",
+            leadingIcon = { Icon(imageVector = Icons.Rounded.Lock, contentDescription = "Icone de cadeado") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            visualTransformation = PasswordVisualTransformation(),
+            isError = state.generalErrorMessage != null && !state.isEmailFormatError,
+            supportingText = null
+        )
+
+        if (state.generalErrorMessage != null) {
+            Spacer(Modifier.height(20.dp))
+            Text(
+                text = state.generalErrorMessage,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 16.sp)
+            )
+        }
+    }
+}
+
+
+@Composable
+fun SignUpContainer(
+    state: AuthState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onConfirmPasswordChange: (String) -> Unit,
+    onEmailFocusChanged: () -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth(0.8f)
+    ) {
+        Text(
+            text = "Hora de criar uma conta",
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontSize = 28.sp),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(32.dp))
+
+        StyledOutlinedTextField(
+            value = state.emailValue,
+            onValueChange = onEmailChange,
+            modifier = Modifier.fillMaxWidth().onFocusChanged { focusState ->
+                if (!focusState.isFocused && state.emailValue.isNotBlank()) { onEmailFocusChanged() }
+            },
+            label = "Email",
+            placeholder = "Primeiro, coloque seu email",
+            leadingIcon = { Icon(imageVector = Icons.Rounded.Email, contentDescription = "Icone de email") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
+            isError = state.isEmailFormatError,
+            supportingText = null
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        StyledOutlinedTextField(
+            value = state.passwordValue,
+            onValueChange = onPasswordChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = "Criar senha",
+            placeholder = "Agora, crie uma senha forte",
+            leadingIcon = { Icon(imageVector = Icons.Rounded.Lock, contentDescription = "Icone de cadeado") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+            visualTransformation = PasswordVisualTransformation(),
+            isError = false, // Lógica de erro de senha aqui
+            supportingText = null
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        StyledOutlinedTextField(
+            value = state.confirmPasswordValue,
+            onValueChange = onConfirmPasswordChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = "Confirmar senha",
+            placeholder = "Digite a mesma senha para confirmar",
+            leadingIcon = { Icon(imageVector = Icons.Rounded.Lock, contentDescription = "Icone de cadeado") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            visualTransformation = PasswordVisualTransformation(),
+            isError = false, // Lógica de erro de confirmação de senha aqui
+            supportingText = null
+        )
+
+        if (state.generalErrorMessage != null) {
+            Spacer(Modifier.height(20.dp))
+            Text(
+                text = state.generalErrorMessage,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 16.sp)
+            )
+        }
     }
 }
