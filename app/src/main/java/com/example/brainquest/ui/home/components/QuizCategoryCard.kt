@@ -125,7 +125,7 @@ fun QuizCategoryCard(
                     contentPadding = PaddingValues(horizontal = 40.dp, vertical = 16.dp)
                 ) {
                     Text(
-                        text = "Bora lá!!",
+                        text = "Bora lá!",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
