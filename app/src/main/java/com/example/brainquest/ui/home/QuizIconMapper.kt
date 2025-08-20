@@ -1,6 +1,7 @@
 package com.example.brainquest.ui.home
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.Pets
@@ -18,7 +19,7 @@ object QuizIconMapper {
     private val iconMap = mapOf(
         "quiz_animais" to Icons.Rounded.Pets,
         "quiz_esportes" to Icons.Rounded.SportsBasketball,
-        "quiz_curiosidades" to Icons.Rounded.HelpOutline,
+        "quiz_curiosidades" to Icons.AutoMirrored.Rounded.HelpOutline,
         "quiz_computacao" to Icons.Rounded.Computer
     )
 
