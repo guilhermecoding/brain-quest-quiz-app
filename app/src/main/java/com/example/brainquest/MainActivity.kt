@@ -17,6 +17,9 @@ import com.example.brainquest.ui.home.HomeScreen
 import com.example.brainquest.ui.theme.BrainQuestTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.brainquest.ui.quiz.QuizScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -46,15 +49,11 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = startDestination) {
 
-                    // 3. Defina cada tela (rota) do seu aplicativo
                     composable("auth_screen") {
                         AuthScreen(
                             onLoginSuccess = {
-                                // Navega para a home e remove a tela de login da pilha
                                 navController.navigate("home_screen") {
-                                    popUpTo("auth_screen") {
-                                        inclusive = true
-                                    }
+                                    popUpTo("auth_screen") { inclusive = true }
                                 }
                             }
                         )
@@ -66,7 +65,23 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate("auth_screen") {
                                     popUpTo(0) { inclusive = true }
                                 }
+                            },
+                            // ✅ PARÂMETRO QUE FALTAVA:
+                            // Definimos o que fazer quando um quiz for iniciado.
+                            onStartQuiz = { quizId ->
+                                // Navega para a nova rota, passando o ID do quiz.
+                                navController.navigate("quiz_screen/$quizId")
                             }
+                        )
+                    }
+
+                    // ✅ NOVA ROTA PARA A TELA DO QUIZ:
+                    composable(
+                        route = "quiz_screen/{quizId}",
+                        arguments = listOf(navArgument("quizId") { type = NavType.StringType })
+                    ) {
+                        QuizScreen(
+                            onNavigateBack = { navController.popBackStack() }
                         )
                     }
                 }

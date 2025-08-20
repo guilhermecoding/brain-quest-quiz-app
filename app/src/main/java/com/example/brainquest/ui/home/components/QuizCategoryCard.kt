@@ -1,8 +1,10 @@
 package com.example.brainquest.ui.home
 
-// ... (todas as suas outras importações)
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -19,6 +21,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -29,24 +32,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.brainquest.ui.theme.AppDimens
+import com.example.brainquest.ui.theme.PrimaryTextColor
+import com.example.brainquest.ui.theme.PurpleTheme
+import com.example.brainquest.ui.theme.YellowTheme
 
-// Adicione este Composable ao seu arquivo
 @Composable
 fun QuizCategoryCard(
     modifier: Modifier = Modifier,
     categoryName: String,
     questionCount: Int,
     progress: Float,
-    illustration: ImageVector, // Usando um ícone como placeholder
+    illustration: ImageVector,
     onStartQuiz: () -> Unit
 ) {
     Card(
         modifier = modifier
-            .width(240.dp) // Largura definida para o card
-            .height(280.dp), // Altura definida para o card
+            .width(360.dp)
+            .height(200.dp)
+            .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(24.dp)),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF6A6AEE) // Cor roxa de fundo do card
+            containerColor = PurpleTheme
         )
     ) {
         Column(
@@ -54,21 +62,35 @@ fun QuizCategoryCard(
                 .fillMaxSize()
                 .padding(20.dp)
         ) {
-            // Título da Categoria
-            Text(
-                text = categoryName,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+            Row {
+                // Placeholder para a Ilustração
+                Icon(
+                    imageVector = illustration,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(36.dp)
                 )
-            )
-            // Número de Questões
-            Text(
-                text = "$questionCount questions",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color.White.copy(alpha = 0.7f)
-                )
-            )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column {
+                    // Título da Categoria
+                    Text(
+                        text = categoryName,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    )
+                    // Número de Questões
+                    Text(
+                        text = "$questionCount questões",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = Color.White.copy(alpha = 0.7f)
+                        )
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -91,36 +113,27 @@ fun QuizCategoryCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(
+                OutlinedButton (
                     onClick = onStartQuiz,
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(50.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFDD835) // Cor amarela do botão
-                    )
+                        containerColor = YellowTheme,
+                        contentColor = PrimaryTextColor
+                    ),
+                    border = BorderStroke(AppDimens.DefaultBorderWidth.width, AppDimens.DefaultBorderWidth.color),
+                    contentPadding = PaddingValues(horizontal = 40.dp, vertical = 16.dp)
                 ) {
                     Text(
-                        text = "Bora!",
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
+                        text = "Bora lá!!",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
                     )
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = illustration,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.5f),
-                        modifier = Modifier.size(80.dp)
-                    )
-                }
             }
         }
     }

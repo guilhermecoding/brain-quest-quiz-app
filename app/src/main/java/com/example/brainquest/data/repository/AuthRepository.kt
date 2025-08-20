@@ -2,6 +2,7 @@ package com.example.brainquest.data.repository
 
 
 import com.example.brainquest.data.local.PrefsManager
+import com.example.brainquest.data.model.Quiz
 import com.example.brainquest.data.model.User
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
