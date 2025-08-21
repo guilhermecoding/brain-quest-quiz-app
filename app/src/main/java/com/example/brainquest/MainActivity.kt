@@ -24,6 +24,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.brainquest.ui.home.HomeViewModel
 import com.example.brainquest.ui.quiz.QuizScreen
+import com.example.brainquest.ui.ranking.RankingScreen
 import com.example.brainquest.ui.result.ResultScreen
 
 @AndroidEntryPoint
@@ -81,6 +82,9 @@ class MainActivity : ComponentActivity() {
                             },
                             onStartQuiz = { quizId ->
                                 navController.navigate("quiz_screen/$quizId")
+                            },
+                            onNavigateToRanking = {
+                                navController.navigate("ranking_screen")
                             }
                         )
                     }
@@ -115,11 +119,16 @@ class MainActivity : ComponentActivity() {
                             score = score,
                             totalQuestions = total,
                             onNavigateHome = {
-                                // Navega para a home, limpando todo o histórico de quiz
                                 navController.navigate("home_screen") {
                                     popUpTo(0)
                                 }
                             }
+                        )
+                    }
+
+                    composable("ranking_screen") {
+                        RankingScreen(
+                            onNavigateBack = { navController.popBackStack() }
                         )
                     }
                 }

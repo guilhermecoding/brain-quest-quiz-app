@@ -1,5 +1,6 @@
 package com.example.brainquest.ui.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,24 +11,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.brainquest.R
 import com.example.brainquest.ui.home.components.QuizHistoryItem
 import com.example.brainquest.ui.home.components.TopBarProfile
+import com.example.brainquest.ui.theme.YellowThemeSecondary
 import java.util.Calendar
 
 @Composable
@@ -35,10 +45,9 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     onLogout: () -> Unit,
-    onStartQuiz: (String) -> Unit
+    onStartQuiz: (String) -> Unit,
+    onNavigateToRanking: () -> Unit
 ) {
-    // A assinatura da HomeScreen foi corrigida para não receber mais o 'state',
-    // pois ela já o obtém do ViewModel.
     val state by viewModel.uiState.collectAsState()
 
     HomeScreenContent(
@@ -48,7 +57,8 @@ fun HomeScreen(
             viewModel.onLogoutClicked()
             onLogout()
         },
-        onStartQuiz = onStartQuiz
+        onStartQuiz = onStartQuiz,
+        onNavigateToRanking = onNavigateToRanking
     )
 }
 
@@ -58,7 +68,8 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier,
     state: HomeState,
     onLogoutClicked: () -> Unit,
-    onStartQuiz: (String) -> Unit
+    onStartQuiz: (String) -> Unit,
+    onNavigateToRanking: () -> Unit
 ) {
     val firstNameUser = state.currentUser?.name?.trim()?.split(" ")?.firstOrNull() ?: "Jogador"
     val calendar = Calendar.getInstance()
@@ -77,11 +88,35 @@ fun HomeScreenContent(
                 .padding(innerPadding)
         ) {
             // -- SEÇÃO SUPERIOR --
-            // Usamos item { } para adicionar um único Composable complexo à lista.
             item {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                ) {
                     TopBarProfile(user = state.currentUser, onLogoutClicked = onLogoutClicked)
+
+                    OutlinedButton(
+                        onClick = onNavigateToRanking,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = YellowThemeSecondary,
+                            contentColor = Color.White
+                        ),
+                        border = BorderStroke(1.dp, Color.Black),
+                        shape = ShapeDefaults.Medium
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.crown),
+                            contentDescription = "Icone do botao"
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(text = "Ranking")
+                    }
+
                     Spacer(modifier = Modifier.height(40.dp))
+
                     Row {
                         Text(
                             text = "$greetingText, ",
