@@ -109,7 +109,7 @@ fun QuizScreen(
 
                     Box(contentAlignment = Alignment.Center) {
                         Image(painter = painterResource(id = R.drawable.avatar), contentDescription = null, modifier = Modifier.height(120.dp))
-                        Text(text = "03:31", color = Color.Black, modifier = Modifier.align(Alignment.TopEnd).background(Color(0xFFFFC107), RoundedCornerShape(12.dp)).padding(horizontal = 12.dp, vertical = 4.dp))
+                        Text(text = state.timerText, color = Color.Black, modifier = Modifier.align(Alignment.TopEnd).background(Color(0xFFFFC107), RoundedCornerShape(12.dp)).padding(horizontal = 12.dp, vertical = 4.dp))
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
