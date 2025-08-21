@@ -1,17 +1,15 @@
 package com.example.brainquest.data.repository
 
 import com.example.brainquest.data.model.Quiz
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
-import com.example.brainquest.data.local.dao.QuizResultDao
 import com.example.brainquest.data.model.QuizResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 class QuizRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val quizResultDao: QuizResultDao,
     private val auth: FirebaseAuth
 ) {
     suspend fun getQuizzes(): Result<List<Quiz>> {

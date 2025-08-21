@@ -1,7 +1,6 @@
 package com.example.brainquest
 
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -11,21 +10,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.brainquest.data.local.PrefsManager
 import com.example.brainquest.ui.auth.AuthScreen
 import com.example.brainquest.ui.home.HomeScreen
-import com.example.brainquest.ui.theme.BrainQuestTheme
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import com.example.brainquest.ui.home.HomeViewModel
 import com.example.brainquest.ui.quiz.QuizScreen
 import com.example.brainquest.ui.ranking.RankingScreen
 import com.example.brainquest.ui.result.ResultScreen
+import com.example.brainquest.ui.theme.BrainQuestTheme
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -36,7 +35,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // <-- REMOVER ISSO ANTES DO BUILD FINAL --> Mantem a tela acesa
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        // window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val startDestination = if (prefsManager.getUserId().isNullOrBlank()) {
             "auth_screen" // Se NÃO houver ID de usuário salvo, comece no login
