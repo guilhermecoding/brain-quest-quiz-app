@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.brainquest.ui.home.components.TopBarProfile
+import java.util.Calendar
 
 @Composable
 fun HomeScreen(
@@ -57,6 +58,16 @@ fun HomeScreenContent(
     onStartQuiz: (String) -> Unit
 ) {
     val firstNameUser = state.currentUser?.name?.trim()?.split(" ")?.firstOrNull() ?: "Jogador"
+
+    val calendar = Calendar.getInstance()
+    val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
+
+    val greetingText = when (hourOfDay) {
+        in 5..11 -> "Bom dia"   // Das 5h às 11h
+        in 12..17 -> "Boa tarde" // Das 12h às 17h
+        else -> "Boa noite"      // O resto (18h às 4h)
+    }
+
     Scaffold { innerPadding ->
         Column(
             modifier = modifier
@@ -71,7 +82,7 @@ fun HomeScreenContent(
 
                 Row {
                     Text(
-                        text = "Bom dia, ",
+                        text = "$greetingText, ",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 20.sp
                         )
