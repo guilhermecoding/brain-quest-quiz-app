@@ -18,6 +18,7 @@ data class HomeState(
     val isLoading: Boolean = true,
     val quizzes: List<Quiz> = emptyList(),
     val currentUser: User? = null,
+    val progressMap: Map<String, Int> = emptyMap(), // Map<ID do Quiz, Nº de vezes completado>
     val errorMessage: String? = null
 )
 
@@ -34,6 +35,7 @@ class HomeViewModel @Inject constructor(
     init {
         fetchQuizzes()
         fetchCurrentUserProfile()
+        fetchUserProgress()
     }
 
     private fun fetchQuizzes() {
@@ -58,6 +60,18 @@ class HomeViewModel @Inject constructor(
             }
             result.onFailure { error ->
                 _uiState.update { it.copy(errorMessage = error.message) }
+            }
+        }
+    }
+
+    private fun fetchUserProgress() {
+        viewModelScope.launch {
+            val result = quizRepository.getQuizHistory()
+            result.onSuccess { historyList ->
+                // Conta quantas vezes cada categoria de quiz aparece na lista de histórico
+                val progress = historyList.groupBy { it.category }
+                    .mapValues { it.value.size }
+                _uiState.update { it.copy(progressMap = progress) }
             }
         }
     }

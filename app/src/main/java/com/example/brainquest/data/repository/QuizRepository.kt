@@ -6,10 +6,12 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import com.example.brainquest.data.local.dao.QuizResultDao
 import com.example.brainquest.data.model.QuizResult
+import com.google.firebase.auth.FirebaseAuth
 
 class QuizRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val quizResultDao: QuizResultDao
+    private val quizResultDao: QuizResultDao,
+    private val auth: FirebaseAuth
 ) {
     suspend fun getQuizzes(): Result<List<Quiz>> {
         return try {
@@ -65,6 +67,23 @@ class QuizRepository @Inject constructor(
             }.await()
 
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Busca todos os registros de histórico de um usuário.
+     */
+    suspend fun getQuizHistory(): Result<List<QuizResult>> {
+        return try {
+            val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuário não logado"))
+            val querySnapshot = firestore.collection("quiz_history")
+                .whereEqualTo("userId", uid)
+                .get()
+                .await()
+            val history = querySnapshot.toObjects(QuizResult::class.java)
+            Result.success(history)
         } catch (e: Exception) {
             Result.failure(e)
         }

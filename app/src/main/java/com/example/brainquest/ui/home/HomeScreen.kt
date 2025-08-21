@@ -109,10 +109,12 @@ fun HomeScreenContent(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(state.quizzes) { quiz ->
+                        val answeredCount = state.progressMap[quiz.title] ?: 0
+
                         QuizCategoryCard(
                             categoryName = quiz.title,
                             questionCount = quiz.questionCount,
-                            progress = 0.0f,
+                            questionsAnswered = answeredCount,
                             illustration = QuizIconMapper.getIconForQuiz(quiz.id),
                             onStartQuiz = { onStartQuiz(quiz.id) }
                         )

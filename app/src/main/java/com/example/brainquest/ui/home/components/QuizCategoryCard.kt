@@ -43,10 +43,16 @@ fun QuizCategoryCard(
     modifier: Modifier = Modifier,
     categoryName: String,
     questionCount: Int,
-    progress: Float,
     illustration: ImageVector,
-    onStartQuiz: () -> Unit
+    onStartQuiz: () -> Unit,
+    questionsAnswered: Int,
 ) {
+    val progress = if (questionCount > 0) {
+        (questionsAnswered.toFloat() / questionCount.toFloat()).coerceIn(0f, 1f)
+    } else {
+        0f
+    }
+
     Card(
         modifier = modifier
             .width(360.dp)
@@ -84,7 +90,7 @@ fun QuizCategoryCard(
                     )
                     // Número de Questões
                     Text(
-                        text = "$questionCount questões",
+                        text = "$questionsAnswered/$questionCount questões",
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = Color.White.copy(alpha = 0.7f)
                         )
