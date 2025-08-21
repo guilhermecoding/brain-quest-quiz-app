@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,16 +36,36 @@ import com.example.brainquest.ui.theme.PurpleTheme
 import com.example.brainquest.ui.theme.YellowThemeSecondary
 
 @Composable
-fun TopBarProfile(modifier: Modifier = Modifier, user: User?) {
+fun TopBarProfile(
+    modifier: Modifier = Modifier,
+    user: User?,
+    onLogoutClicked: () -> Unit
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Bottom,
     ) {
         UserAvatar()
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        LevelProgressInfo(user = user)
+        LevelProgressInfo(
+            user = user,
+            modifier = Modifier.weight(1f)
+        )
+
+        Spacer(modifier = Modifier.width(20.dp))
+
+        IconButton(
+            onClick = onLogoutClicked,
+            modifier = Modifier.size(24.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Logout,
+                contentDescription = "Sair da conta",
+                tint = Color.Red.copy(alpha = 0.6f)
+            )
+        }
     }
 }
 
@@ -77,9 +99,7 @@ fun UserAvatar(modifier: Modifier = Modifier) {
 fun LevelProgressInfo(modifier: Modifier = Modifier, user: User?) {
     val userXp = user?.totalScore ?: 0L
 
-    // ✅ 1. Defina o valor máximo e calcule o progresso
-    val maxLevelXp = 100f // Define o XP máximo para o nível como Float
-    // Calcula a porcentagem. Ex: 210 / 300 = 0.7
+    val maxLevelXp = 100f
     val progress = (userXp.toFloat() / maxLevelXp).coerceIn(0f, 1f)
 
     Column(modifier = modifier) {

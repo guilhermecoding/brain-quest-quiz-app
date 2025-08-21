@@ -65,7 +65,7 @@ fun HomeScreenContent(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
 
-                TopBarProfile(user = state.currentUser)
+                TopBarProfile(user = state.currentUser, onLogoutClicked = onLogoutClicked)
 
                 Spacer(modifier = Modifier.height(40.dp))
 
