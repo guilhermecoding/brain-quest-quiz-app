@@ -78,7 +78,7 @@ fun LevelProgressInfo(modifier: Modifier = Modifier, user: User?) {
     val userXp = user?.totalScore ?: 0L
 
     // ✅ 1. Defina o valor máximo e calcule o progresso
-    val maxLevelXp = 300f // Define o XP máximo para o nível como Float
+    val maxLevelXp = 100f // Define o XP máximo para o nível como Float
     // Calcula a porcentagem. Ex: 210 / 300 = 0.7
     val progress = (userXp.toFloat() / maxLevelXp).coerceIn(0f, 1f)
 
