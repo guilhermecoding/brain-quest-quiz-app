@@ -18,6 +18,9 @@ data class QuizState(
     val questions: List<Question> = emptyList(),
     val currentQuestionIndex: Int = 0,
     val selectedAnswerIndex: Int? = null,
+    val userAnswers: Map<Int, Int> = emptyMap(), // Map<Índice da Pergunta, Índice da Resposta>
+    val quizFinished: Boolean = false,
+    val finalScore: Int = 0,
     val errorMessage: String? = null
 ) {
     val currentQuestion: Question?
@@ -64,21 +67,47 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    fun onAnswerSelected(index: Int) {
-        _uiState.update { it.copy(selectedAnswerIndex = index) }
+    fun onAnswerSelected(answerIndex: Int) {
+        val newAnswers = _uiState.value.userAnswers.toMutableMap()
+        newAnswers[_uiState.value.currentQuestionIndex] = answerIndex
+        _uiState.update {
+            it.copy(
+                selectedAnswerIndex = answerIndex,
+                userAnswers = newAnswers
+            )
+        }
     }
 
     fun onNextClicked() {
-        if (_uiState.value.currentQuestionIndex < _uiState.value.totalQuestions - 1) {
+        // Se for a última pergunta, finalize o quiz
+        if (_uiState.value.currentQuestionIndex == _uiState.value.totalQuestions - 1) {
+            finishQuiz()
+        } else {
+            // Caso contrário, avance para a próxima
             _uiState.update {
                 it.copy(
                     currentQuestionIndex = it.currentQuestionIndex + 1,
-                    selectedAnswerIndex = null // Reseta a resposta selecionada
+                    selectedAnswerIndex = null // Reseta a seleção para a nova pergunta
                 )
             }
-        } else {
-            // TODO: Finalizar o quiz e navegar para a tela de resultados
         }
+    }
+
+    private fun finishQuiz() {
+        var correctAnswers = 0
+        val questions = _uiState.value.questions
+        val userAnswers = _uiState.value.userAnswers
+
+        for (i in questions.indices) {
+            val correctAnswerIndex = questions[i].resposta_correta
+            val userAnswerIndex = userAnswers[i]
+            if (correctAnswerIndex == userAnswerIndex) {
+                correctAnswers++
+            }
+        }
+
+        // Atualiza o estado para sinalizar que o quiz acabou e guarda a pontuação
+        _uiState.update { it.copy(quizFinished = true, finalScore = correctAnswers) }
     }
 
     fun onPreviousClicked() {

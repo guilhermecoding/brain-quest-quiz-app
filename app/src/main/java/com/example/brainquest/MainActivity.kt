@@ -20,6 +20,7 @@ import javax.inject.Inject
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.brainquest.ui.quiz.QuizScreen
+import com.example.brainquest.ui.result.ResultScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -81,7 +82,35 @@ class MainActivity : ComponentActivity() {
                         arguments = listOf(navArgument("quizId") { type = NavType.StringType })
                     ) {
                         QuizScreen(
-                            onNavigateBack = { navController.popBackStack() }
+                            onNavigateBack = { navController.popBackStack() },
+                            // Passe o novo callback para a QuizScreen
+                            onQuizFinished = { score, total ->
+                                // Navega para a tela de resultado, limpando a tela do quiz do histórico
+                                navController.navigate("result_screen/$score/$total") {
+                                    popUpTo("quiz_screen/{quizId}") { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = "result_screen/{score}/{total}",
+                        arguments = listOf(
+                            navArgument("score") { type = NavType.IntType },
+                            navArgument("total") { type = NavType.IntType }
+                        )
+                    ) { backStackEntry ->
+                        val score = backStackEntry.arguments?.getInt("score") ?: 0
+                        val total = backStackEntry.arguments?.getInt("total") ?: 0
+                        ResultScreen(
+                            score = score,
+                            totalQuestions = total,
+                            onNavigateHome = {
+                                // Navega para a home, limpando todo o histórico de quiz
+                                navController.navigate("home_screen") {
+                                    popUpTo(0)
+                                }
+                            }
                         )
                     }
                 }

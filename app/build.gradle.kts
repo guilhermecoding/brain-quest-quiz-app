@@ -70,6 +70,10 @@ dependencies {
 
     // Navigation Compose
     implementation(libs.androidx.navigation.compose)
+    
+
+    // Lottie Animations
+    implementation(libs.lottie.compose)
 
     // Dependências de Teste
     testImplementation(libs.junit)
