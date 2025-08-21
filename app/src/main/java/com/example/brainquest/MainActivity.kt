@@ -73,7 +73,6 @@ class MainActivity : ComponentActivity() {
 
                         // 3. Chame a HomeScreen passando apenas os parâmetros necessários.
                         HomeScreen(
-                            state = state,
                             onLogout = {
                                 viewModel.onLogoutClicked()
                                 navController.navigate("auth_screen") {

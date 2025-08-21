@@ -7,6 +7,7 @@ import javax.inject.Inject
 import com.example.brainquest.data.local.dao.QuizResultDao
 import com.example.brainquest.data.model.QuizResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.Query
 
 class QuizRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -80,6 +81,7 @@ class QuizRepository @Inject constructor(
             val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Usuário não logado"))
             val querySnapshot = firestore.collection("quiz_history")
                 .whereEqualTo("userId", uid)
+                .orderBy("completedAt", Query.Direction.DESCENDING)
                 .get()
                 .await()
             val history = querySnapshot.toObjects(QuizResult::class.java)
