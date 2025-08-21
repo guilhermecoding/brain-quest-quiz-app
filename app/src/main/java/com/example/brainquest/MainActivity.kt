@@ -6,8 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,6 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.brainquest.ui.home.HomeViewModel
 import com.example.brainquest.ui.quiz.QuizScreen
 import com.example.brainquest.ui.result.ResultScreen
 
@@ -61,16 +65,22 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("home_screen") {
+                        // 1. Obtenha a instância do ViewModel.
+                        val viewModel: HomeViewModel = hiltViewModel()
+
+                        // 2. Colete o estado a partir do ViewModel.
+                        val state by viewModel.uiState.collectAsState()
+
+                        // 3. Chame a HomeScreen passando apenas os parâmetros necessários.
                         HomeScreen(
+                            state = state,
                             onLogout = {
+                                viewModel.onLogoutClicked()
                                 navController.navigate("auth_screen") {
                                     popUpTo(0) { inclusive = true }
                                 }
                             },
-                            // ✅ PARÂMETRO QUE FALTAVA:
-                            // Definimos o que fazer quando um quiz for iniciado.
                             onStartQuiz = { quizId ->
-                                // Navega para a nova rota, passando o ID do quiz.
                                 navController.navigate("quiz_screen/$quizId")
                             }
                         )

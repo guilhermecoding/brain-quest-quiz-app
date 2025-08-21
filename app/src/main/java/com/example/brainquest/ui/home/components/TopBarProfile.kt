@@ -29,11 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.brainquest.R
+import com.example.brainquest.data.model.User
 import com.example.brainquest.ui.theme.PurpleTheme
 import com.example.brainquest.ui.theme.YellowThemeSecondary
 
 @Composable
-fun TopBarProfile(modifier: Modifier = Modifier) {
+fun TopBarProfile(modifier: Modifier = Modifier, user: User?) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -42,7 +43,7 @@ fun TopBarProfile(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        LevelProgressInfo()
+        LevelProgressInfo(user = user)
     }
 }
 
@@ -73,7 +74,14 @@ fun UserAvatar(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun LevelProgressInfo(modifier: Modifier = Modifier) {
+fun LevelProgressInfo(modifier: Modifier = Modifier, user: User?) {
+    val userXp = user?.totalScore ?: 0L
+
+    // ✅ 1. Defina o valor máximo e calcule o progresso
+    val maxLevelXp = 300f // Define o XP máximo para o nível como Float
+    // Calcula a porcentagem. Ex: 210 / 300 = 0.7
+    val progress = (userXp.toFloat() / maxLevelXp).coerceIn(0f, 1f)
+
     Column(modifier = modifier) {
         Text(
             text = "Meu progresso",
@@ -87,9 +95,8 @@ fun LevelProgressInfo(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(4.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            // A barra de progresso ocupa o espaço disponível
             LinearProgressIndicator(
-                progress = { 0.7f },
+                progress = { progress },
                 modifier = Modifier
                     .weight(1f)
                     .height(12.dp)
@@ -117,7 +124,7 @@ fun LevelProgressInfo(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = "323 XP",
+                text = "$userXp XP",
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontWeight = FontWeight.Bold,
                     color = YellowThemeSecondary,

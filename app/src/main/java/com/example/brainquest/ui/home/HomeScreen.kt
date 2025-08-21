@@ -32,7 +32,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     onLogout: () -> Unit,
-    onStartQuiz: (String) -> Unit
+    onStartQuiz: (String) -> Unit,
+    state: HomeState,
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -55,6 +56,7 @@ fun HomeScreenContent(
     onLogoutClicked: () -> Unit,
     onStartQuiz: (String) -> Unit
 ) {
+    val firstNameUser = state.currentUser?.name?.trim()?.split(" ")?.firstOrNull() ?: "Jogador"
     Scaffold { innerPadding ->
         Column(
             modifier = modifier
@@ -63,7 +65,7 @@ fun HomeScreenContent(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
 
-                TopBarProfile()
+                TopBarProfile(user = state.currentUser)
 
                 Spacer(modifier = Modifier.height(40.dp))
 
@@ -76,7 +78,7 @@ fun HomeScreenContent(
                     )
 
                     Text(
-                        text = "Matheus!",
+                        text = "$firstNameUser!",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold

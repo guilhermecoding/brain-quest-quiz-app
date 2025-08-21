@@ -11,12 +11,6 @@ class QuizRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val quizResultDao: QuizResultDao
 ) {
-    // ... (função de upload que você pode apagar depois) ...
-
-    /**
-     * Busca todos os documentos da coleção 'quizzes' no Firestore.
-     * Converte cada documento em um objeto Quiz.
-     */
     suspend fun getQuizzes(): Result<List<Quiz>> {
         return try {
             val querySnapshot = firestore.collection("quizzes").get().await()
@@ -43,13 +37,32 @@ class QuizRepository @Inject constructor(
 
     suspend fun saveQuizResult(result: QuizResult): Result<Unit> {
         return try {
-            // Ação 1: Salvar no Cloud Firestore (para a nuvem)
             firestore.collection("quiz_history").add(result).await()
 
-            // Ação 2: Salvar no banco de dados local (Room)
-            quizResultDao.insert(result)
+            // Ação 2: Usar uma transação para atualizar o perfil do usuário
+            val userDocRef = firestore.collection("users").document(result.userId)
 
-            // Você pode adicionar a lógica de atualizar o 'highScore' aqui também
+            firestore.runTransaction { transaction ->
+                val userSnapshot = transaction.get(userDocRef)
+
+                // Pega os valores atuais (ou 0 se não existirem)
+                val currentHighScore = userSnapshot.getLong("highScore") ?: 0L
+                val currentCompleted = userSnapshot.getLong("quizzesCompleted") ?: 0L
+                val currentTotalScore = userSnapshot.getLong("totalScore") ?: 0L // ✅ Pega a soma atual
+
+                // Lógica do High Score (continua igual)
+                if (result.score > currentHighScore) {
+                    transaction.update(userDocRef, "highScore", result.score)
+                }
+
+                // Lógica dos Quizzes Completados (continua igual)
+                transaction.update(userDocRef, "quizzesCompleted", currentCompleted + 1)
+
+                // ✅ LÓGICA PARA SOMAR O SCORE
+                val newTotalScore = currentTotalScore + result.score
+                transaction.update(userDocRef, "totalScore", newTotalScore)
+
+            }.await()
 
             Result.success(Unit)
         } catch (e: Exception) {

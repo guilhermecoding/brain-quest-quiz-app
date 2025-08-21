@@ -3,6 +3,7 @@ package com.example.brainquest.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.brainquest.data.model.Quiz
+import com.example.brainquest.data.model.User
 import com.example.brainquest.data.repository.AuthRepository
 import com.example.brainquest.data.repository.QuizRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,7 @@ import javax.inject.Inject
 data class HomeState(
     val isLoading: Boolean = true,
     val quizzes: List<Quiz> = emptyList(),
+    val currentUser: User? = null,
     val errorMessage: String? = null
 )
 
@@ -31,6 +33,7 @@ class HomeViewModel @Inject constructor(
     // O bloco init é executado assim que o ViewModel é criado
     init {
         fetchQuizzes()
+        fetchCurrentUserProfile()
     }
 
     private fun fetchQuizzes() {
@@ -42,6 +45,19 @@ class HomeViewModel @Inject constructor(
             }
             result.onFailure { error ->
                 _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
+            }
+        }
+    }
+
+    // ✅ 3. Nova função para buscar os dados do usuário
+    private fun fetchCurrentUserProfile() {
+        viewModelScope.launch {
+            val result = authRepository.getCurrentUserProfile()
+            result.onSuccess { user ->
+                _uiState.update { it.copy(currentUser = user) }
+            }
+            result.onFailure { error ->
+                _uiState.update { it.copy(errorMessage = error.message) }
             }
         }
     }

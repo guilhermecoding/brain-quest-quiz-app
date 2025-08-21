@@ -51,6 +51,22 @@ class AuthRepository @Inject constructor(
             Result.failure(e) // Retorna a exceção em caso de falha
         }
     }
+    /**
+     * Busca os dados do perfil do usuário logado no momento na coleção 'users'.
+     */
+    suspend fun getCurrentUserProfile(): Result<User?> {
+        return try {
+            val uid = auth.currentUser?.uid
+            if (uid == null) {
+                return Result.success(null) // Nenhum usuário logado
+            }
+            val document = firestore.collection("users").document(uid).get().await()
+            val user = document.toObject(User::class.java)
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     fun logout() {
         auth.signOut() // Desloga do Firebase Authentication
