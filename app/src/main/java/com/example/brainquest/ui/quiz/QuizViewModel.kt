@@ -3,7 +3,9 @@ package com.example.brainquest.ui.quiz
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.brainquest.data.local.PrefsManager
 import com.example.brainquest.data.model.Question
+import com.example.brainquest.data.model.QuizResult
 import com.example.brainquest.data.repository.QuizRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +34,7 @@ data class QuizState(
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val quizRepository: QuizRepository,
+    private val prefsManager: PrefsManager,
     savedStateHandle: SavedStateHandle // Para receber o ID do quiz da navegação
 ) : ViewModel() {
 
@@ -94,20 +97,32 @@ class QuizViewModel @Inject constructor(
     }
 
     private fun finishQuiz() {
-        var correctAnswers = 0
-        val questions = _uiState.value.questions
-        val userAnswers = _uiState.value.userAnswers
-
-        for (i in questions.indices) {
-            val correctAnswerIndex = questions[i].resposta_correta
-            val userAnswerIndex = userAnswers[i]
-            if (correctAnswerIndex == userAnswerIndex) {
-                correctAnswers++
+        viewModelScope.launch {
+            // Lógica de cálculo da pontuação
+            var correctAnswers = 0
+            val questions = _uiState.value.questions
+            val userAnswers = _uiState.value.userAnswers
+            for (i in questions.indices) {
+                if (questions[i].resposta_correta == userAnswers[i]) {
+                    correctAnswers++
+                }
             }
-        }
 
-        // Atualiza o estado para sinalizar que o quiz acabou e guarda a pontuação
-        _uiState.update { it.copy(quizFinished = true, finalScore = correctAnswers) }
+            // Cria o objeto de resultado e manda salvar
+            val userId = prefsManager.getUserId()
+            if (userId != null) {
+                val result = QuizResult(
+                    userId = userId,
+                    score = correctAnswers,
+                    category = _uiState.value.quizTitle,
+                    totalQuestions = _uiState.value.totalQuestions
+                )
+                quizRepository.saveQuizResult(result) // Chama o repositório
+            }
+
+            // Atualiza a UI para navegar para a tela de resultados
+            _uiState.update { it.copy(quizFinished = true, finalScore = correctAnswers) }
+        }
     }
 
     fun onPreviousClicked() {
@@ -120,4 +135,7 @@ class QuizViewModel @Inject constructor(
             }
         }
     }
+
+
+
 }

@@ -7,6 +7,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+import android.content.Context
+import androidx.room.Room
+import com.example.brainquest.data.local.dao.QuizResultDao
+import com.example.brainquest.data.local.database.QuizDatabase
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -22,5 +27,21 @@ object AppModule {
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore {
         return FirebaseFirestore.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideQuizDatabase(@ApplicationContext context: Context): QuizDatabase {
+        return Room.databaseBuilder(
+            context,
+            QuizDatabase::class.java,
+            "quiz_database"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideQuizResultDao(database: QuizDatabase): QuizResultDao {
+        return database.quizResultDao()
     }
 }

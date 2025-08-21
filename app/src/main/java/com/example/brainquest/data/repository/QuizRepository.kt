@@ -4,9 +4,12 @@ import com.example.brainquest.data.model.Quiz
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import com.example.brainquest.data.local.dao.QuizResultDao
+import com.example.brainquest.data.model.QuizResult
 
 class QuizRepository @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val quizResultDao: QuizResultDao
 ) {
     // ... (função de upload que você pode apagar depois) ...
 
@@ -33,6 +36,22 @@ class QuizRepository @Inject constructor(
             } else {
                 Result.failure(Exception("Quiz não encontrado"))
             }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun saveQuizResult(result: QuizResult): Result<Unit> {
+        return try {
+            // Ação 1: Salvar no Cloud Firestore (para a nuvem)
+            firestore.collection("quiz_history").add(result).await()
+
+            // Ação 2: Salvar no banco de dados local (Room)
+            quizResultDao.insert(result)
+
+            // Você pode adicionar a lógica de atualizar o 'highScore' aqui também
+
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
